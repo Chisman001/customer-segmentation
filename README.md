@@ -45,6 +45,35 @@ customer-segmentation/
 └── README.md              # Project documentation
 ```
 
+## Screenshots
+
+### Dashboard Overview
+![Customer Segmentation Dashboard Overview](images/customer_segmentation_dashboard.png)
+
+### Dataset Preview
+![Dataset Preview](images/dataset_preview.png)
+
+### Exploratory Data Analysis - Age
+![EDA Age Distribution](images/eda_analysis_age.png)
+
+### Exploratory Data Analysis - Annual Income
+![EDA Annual Income Distribution](images/eda_analysis_anual_income.png)
+
+### Exploratory Data Analysis - Spending Score
+![EDA Spending Score Distribution](images/eda_analysis_spending.png)
+
+### Correlation Analysis
+![Correlation Analysis](images/correlation_analysis.png)
+
+### Customer Segmentation
+![Customer Segmentation](images/customer_segmentation.png)
+
+### Business Insights
+![Business Insights](images/Business_insights.png)
+
+### Application Banner
+![Application Banner](images/banner.png)
+
 ## Dataset
 
 The project uses a customer dataset containing fields such as:
