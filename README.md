@@ -36,6 +36,10 @@ The dashboard helps users:
 ```text
 customer-segmentation/
 ├── app.py                 # Main Streamlit application
+├── train.py               # Offline model training script
+├── models/
+│   ├── kmeans_model.pkl   # Trained K-Means model
+│   └── scaler.pkl         # Fitted StandardScaler
 ├── data/
 │   └── store_customers.csv
 ├── images/
@@ -107,6 +111,14 @@ python -m venv .venv
 pip install -r requirement.txt
 ```
 
+4. Train the model and save artifacts:
+
+```bash
+python train.py
+```
+
+This creates `models/scaler.pkl` and `models/kmeans_model.pkl`. The Streamlit app loads these files at runtime instead of retraining on every visit.
+
 ## Run the Application
 
 Start the dashboard locally with:
@@ -116,6 +128,17 @@ streamlit run app.py
 ```
 
 Then open the local URL shown in the terminal in your browser.
+
+## Model Training and Deployment
+
+The segmentation model is trained offline with `train.py` and saved to the `models/` directory. The app uses `@st.cache_resource` to load the artifacts once per server process.
+
+Retrain and redeploy when:
+- the dataset is updated
+- segmentation features change
+- cluster count or other hyperparameters change
+
+For Streamlit Community Cloud, include the `models/` directory in the repository so the deployed app can load the saved models without running training at startup.
 
 ## Usage
 

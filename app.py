@@ -1,9 +1,9 @@
+import joblib
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.cluster import KMeans
-from sklearn.preprocessing import StandardScaler
+from pathlib import Path
 
 st.set_page_config(
   page_title="Customer Segmentation Dashboard",
@@ -12,6 +12,19 @@ st.set_page_config(
 )
 
 st.image("images/banner.png", use_container_width=True)
+
+
+@st.cache_resource
+def load_models():
+    model_dir = Path("models")
+    scaler_path = model_dir / "scaler.pkl"
+    kmeans_path = model_dir / "kmeans_model.pkl"
+
+    if not scaler_path.exists() or not kmeans_path.exists():
+        return None
+
+    return joblib.load(scaler_path), joblib.load(kmeans_path)
+
 
 df = pd.read_csv("data/store_customers.csv")
 
@@ -170,43 +183,42 @@ elif page == "Customer Segmentation":
     represents a different customer segment with similar purchasing behaviour.
     """)
 
+    models = load_models()
+    if models is None:
+        st.error("Trained models not found. Run: python train.py")
+        st.stop()
+
+    scaler, kmeans = models
+
     df = df.dropna().copy()
     X = df[["Annual Income (k$)", "Spending Score (1-100)"]]
-
-    scaler = StandardScaler()
-    X_scaled = scaler.fit_transform(X)
-
-    kmeans = KMeans(n_clusters=4, random_state=42)
-
-    df["Cluster"] = kmeans.fit_predict(X_scaled)
+    X_scaled = scaler.transform(X)
+    df["Cluster"] = kmeans.predict(X_scaled)
 
     fig, ax = plt.subplots(figsize=(9,6))
 
-    scatter = ax.scatter(
+    ax.scatter(
         df["Annual Income (k$)"],
         df["Spending Score (1-100)"],
         c=df["Cluster"]
     )
 
-    ax.set_title("Customer Segments")
-
-    ax.set_xlabel("Annual Income (k$)")
-    ax.set_ylabel("Spending Score (1-100)")
-
-    st.pyplot(fig)
-
     centroids = scaler.inverse_transform(kmeans.cluster_centers_)
-
     ax.scatter(
-        centroids[:,0],
-        centroids[:,1],
+        centroids[:, 0],
+        centroids[:, 1],
         marker="X",
         s=300,
         c="red",
         label="Centroids"
     )
 
+    ax.set_title("Customer Segments")
+    ax.set_xlabel("Annual Income (k$)")
+    ax.set_ylabel("Spending Score (1-100)")
     ax.legend()
+
+    st.pyplot(fig)
 
     cluster_summary = df.groupby("Cluster")[
         ["Age",
